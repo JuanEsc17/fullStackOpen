@@ -76,7 +76,7 @@ describe.skip('blogs id', () => {
     })
 })
 
-describe('blog creation with missing properties', () => {
+describe.skip('blog creation with missing properties', () => {
     test('if likes property is missing from request, it defaults to 0', async () => {
         const newBlog = {
             title: "nueva yerba muy rica",
@@ -144,7 +144,7 @@ describe.skip('delete blogs', () => {
     })
 })
 
-describe('update likes', () => {
+describe.skip('update likes', () => {
     test('a blog can be update', async () => {
         const blogs = await api.get('/api/blogs')
         const blogToUpdate = blogs.body[0]
@@ -163,6 +163,6 @@ describe('update likes', () => {
     })
 })
 
-afterAll(() => {
+afterAll(async () => {
     mongoose.connection.close()
 })

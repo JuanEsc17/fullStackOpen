@@ -5,7 +5,6 @@ const blogSchema = new Schema({
     type: String,
     required: true
   },
-  author: String,
   url: {
     type: String,
     required: true
@@ -13,6 +12,10 @@ const blogSchema = new Schema({
   likes: {
     type: Number,
     default: 0
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   }
 })
 
