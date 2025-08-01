@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Viva la patria",
-  "author": "Milo",
-  "url": "unawebinventada.com/viva",
-  "likes": "1211"
+    "title": "Informe cafe",
+  "author": "Julian",
+  "url": "cafecafecafe.com/rico",
+  "likes": "111"
 }

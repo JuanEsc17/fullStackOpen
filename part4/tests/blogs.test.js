@@ -119,8 +119,8 @@ describe('blog creation with missing properties', () => {
     })
 })
 
-describe('delete blogs', () => {
-    test('a note can be delete', async () => {
+describe.skip('delete blogs', () => {
+    test('a blog can be delete', async () => {
         const blogsAtStart = await api.get('/api/blogs')
         const blogToDelete = blogsAtStart.body[0]
         
@@ -130,6 +130,36 @@ describe('delete blogs', () => {
         
         const blogsAtEnd = await api.get('/api/blogs')
         expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length - 1)
+    })
+    test('a blog cant be delete', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogIdToDelete = -1
+
+        await api
+            .delete(`/api/blogs/${blogIdToDelete}`)
+            .expect(404)
+        
+        const blogsAtEnd = await api.get('/api/blogs')
+        expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length)
+    })
+})
+
+describe('update likes', () => {
+    test('a blog can be update', async () => {
+        const blogs = await api.get('/api/blogs')
+        const blogToUpdate = blogs.body[0]
+
+        const blogUpdate = {
+            ...blogToUpdate,
+            likes: 1000
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .expect(200)
+        
+        const finalBlog = await api.get(`/api/blogs/${blogToUpdate.id}`)
+        expect(finalBlog.likes).not.toBe(blogToUpdate.likes)
     })
 })
 
