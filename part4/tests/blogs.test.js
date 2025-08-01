@@ -1,100 +1,138 @@
-const listHelper = require('../utils/list_helper')
+const mongoose = require('mongoose')
+const Blog = require('../models/Blog')
+const { blogs, api } = require('../utils/list_helper')
 
-const blogs = [
-  {
-    _id: "5a422a851b54a676234d17f7",
-    title: "React patterns",
-    author: "Michael Chan",
-    url: "https://reactpatterns.com/",
-    likes: 7,
-    __v: 0
-  },
-  {
-    _id: "5a422aa71b54a676234d17f8",
-    title: "Go To Statement Considered Harmful",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-    likes: 5,
-    __v: 0
-  },
-  {
-    _id: "5a422b3a1b54a676234d17f9",
-    title: "Canonical string reduction",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-    likes: 12,
-    __v: 0
-  },
-  {
-    _id: "5a422b891b54a676234d17fa",
-    title: "First class tests",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 10,
-    __v: 0
-  },
-  {
-    _id: "5a422ba71b54a676234d17fb",
-    title: "TDD harms architecture",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 0,
-    __v: 0
-  },
-  {
-    _id: "5a422bc61b54a676234d17fc",
-    title: "Type wars",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-    likes: 2,
-    __v: 0
-  }  
- ]
+beforeEach(async () => {
+    await Blog.deleteMany({})
 
-
-test('dummy returns one', () => {
-  const blogs = []
-
-  const result = listHelper.dummy(blogs)
-  expect(result).toBe(1)
-})
-
-describe('likes', () => {
-    const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-      likes: 5,
-      __v: 0
+    for (let blog of blogs){
+        const newBlog = new Blog(blog)
+        await newBlog.save()
     }
-  ]
+})
 
-    test('total of likes on a array with one blogs', () => {
-        expect(listHelper.totalLikes(listWithOneBlog)).toBe(5)
+describe.skip('existing blogs', () => {
+    test('there are two blogs', async () => {
+        const response = await api.get('/api/blogs')
+        
+        expect(response.body).toHaveLength(blogs.length)
     })
 
-    test('total of likes on a array with such of blogs', () => {
-        expect(listHelper.totalLikes(blogs)).toBe(36)
+    test('the first blog is about react', async () => {
+        const response = await api.get('/api/blogs')
+        const titles = response.body.map(blog => blog.title)
+
+        expect(titles).toContain('React patterns')
     })
 })
 
-describe('favorite blog', () => {
-    test('favorite blog of an array of such of blogs', () => {
-        const result = listHelper.favoriteBlog(blogs)
-        expect(result).toStrictEqual({
-            _id: "5a422b3a1b54a676234d17f9",
-            title: "Canonical string reduction",
-            author: "Edsger W. Dijkstra",
-            url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-            likes: 12,
-            __v: 0
+describe.skip('add a blog', () => {
+    test('a valid blog can be added', async () => {
+        const newBlog = {
+            title: "Maniana paro",
+            author: "pepito",
+            url: "www.hdsahsahs.com/sajs",
+            likes: 2313
+        }
+
+        await api
+            .post('/api/blogs/')
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+        const titles = response.body.map(blog => blog.title)
+
+        expect(titles).toContain(newBlog.title)
+        expect(response.body).toHaveLength(blogs.length + 1)
+    })
+
+    test('blog without title is not added', async () => {
+        const newBlog = {
+            author: 'pepe',
+            url: 'blogger.com/dasdas',
+            likes: 1
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        const response = await api.get('/api/blogs')
+
+        expect(response.body).toHaveLength(blogs.length)
+    })
+})
+
+describe.skip('blogs id', () => {
+    test.skip('blog posts have id property instead of _id', async () => {
+        const response = await api.get('/api/blogs')
+        response.body.forEach(blog => {
+            expect(blog.id).toBeDefined()
+            expect(blog._id).toBeUndefined()
         })
     })
+})
 
-    test('favorite blog of an array without elements', () => {
-        const result = listHelper.favoriteBlog([])
-        expect(result).toBe(null)
+describe('blog creation with missing properties', () => {
+    test('if likes property is missing from request, it defaults to 0', async () => {
+        const newBlog = {
+            title: "nueva yerba muy rica",
+            author: "miguel angel",
+            url: "yerbasricas.com/abc123"
+        }
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
+        expect(response.body.likes).toBe(0)
     })
+    test('if url is missing from request, it returns 400 Bad Request', async () => {
+        const newBlog = {
+            title: "Avion estrella en el mar",
+            author: "Spinetta",
+            likes: 2312
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+        
+        expect(response.status).toBe(400)
+    })
+    test('if title is missing from request, it returns 400 Bad Request', async () => {
+        const newBlog = {
+            author: "Sandro",
+            url: "www.unblogcualquiera.com/blog",
+            likes: 2312
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+        
+        expect(response.status).toBe(400)
+    })
+})
+
+describe('delete blogs', () => {
+    test('a note can be delete', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToDelete = blogsAtStart.body[0]
+        
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+        
+        const blogsAtEnd = await api.get('/api/blogs')
+        expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length - 1)
+    })
+})
+
+afterAll(() => {
+    mongoose.connection.close()
 })

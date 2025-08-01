@@ -6,10 +6,16 @@ const middleware = require('./utils/middlewares')
 const blogsRouter = require('./controllers/blogs')
 require('dotenv').config()
 
-const mongoUrl = process.env.MONGO_DB_URI
-mongoose.connect(mongoUrl)
+const { MONGO_DB_URI, MONGO_DB_URI_TEST, NODE_ENV }= process.env
+
+const connectionString = NODE_ENV === 'test' 
+? MONGO_DB_URI_TEST
+: MONGO_DB_URI
+
+mongoose.connect(connectionString)
   .then(() => {
-    console.log('connected to MongoDB')
+    console.log(`connected to MongoDB ${NODE_ENV === 'test' ? test : "normal"}`)
+    console.log()
   })
   .catch((error) => {
    console.error('error connecting to MongoDB:', error.message)
@@ -24,4 +30,4 @@ app.use('/api/blogs', blogsRouter)
 app.use(middleware.notFound)
 app.use(middleware.handleErrors)
 
-module.exports = app 
+module.exports = app
