@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YTBmNjBjODE4ZDczMTdlYzhkMzAwMCIsInVzZXJuYW1lIjoidW5Vc2VyQW5vbmltbyIsImlhdCI6MTc1NTM4MTU3Nn0.47zp8u0NX7jHFjsmRdnnuGQPCdRYFq0V--NzaqqGoF8
 
 {
-    "title": "Informe cafe",
-  "author": "Julian",
-  "url": "cafecafecafe.com/rico",
-  "likes": "111"
+    "title": "Yerbas mas ricas",
+  "url": "yerbas.com/masricas",
+  "likes": "12132321"
 }

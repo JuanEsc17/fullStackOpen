@@ -13,7 +13,7 @@ describe('creating a new user', () => {
             passwordHash
         })
 
-        user.save()
+        await user.save()
     })
 
     test('works at expected creating a fresh username', async () => {
@@ -40,8 +40,30 @@ describe('creating a new user', () => {
         const usernames = usersAtEnd.map(user => user.username)
         expect(usernames).toContain(newUser.username)
     })
+
+    test('creation fails with proper statuscode and message if username is already taken', async () => {
+        const users = await User.find({})
+        const usersAtStart = users.map(user => user.toJSON())
+
+        const newUser = {
+            username: 'JuanEsc17',
+            name: 'Juan',
+            password: 'abc'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(result.body.error).toContain('`username` to be unique')
+
+        const usersAtEnd = users.map(user => user.toJSON())
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })  
 })
 
 afterAll(async () => {
-    mongoose.connection.close()
+    await mongoose.connection.close()
 })
