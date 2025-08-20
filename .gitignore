@@ -1,0 +1,21 @@
+# Ignorar todas las carpetas node_modules en cualquier nivel
+node_modules/
+
+# Ignorar archivos de entorno
+.env
+.env.local
+.env.production
+
+# Ignorar carpetas de build
+dist/
+build/
+
+# Ignorar archivos de log
+*.log
+npm-debug.log*
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+part3/

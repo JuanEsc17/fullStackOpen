@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YTBmNjBjODE4ZDczMTdlYzhkMzAwMCIsInVzZXJuYW1lIjoidW5Vc2VyQW5vbmltbyIsImlhdCI6MTc1NTM4NjEzMSwiZXhwIjoxNzU1OTkwOTMxfQ.eYSMkyAjxW_0JDG7I5_Kq4-PuWGMs74ZrVHvuqnAj6Q
+
+{
+    "title": "Aleluya",
+  "url": "probando.com",
+  "likes": "666"
+}
