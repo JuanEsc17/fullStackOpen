@@ -66,15 +66,11 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {
-  const userId = request.userId
+  const id = request.params.id
   const blog = request.body
 
   if(!blog){
     response.status(404).json({error: 'Blog not found'})
-  }
-
-  if (userId !== blog.user.toString()){
-    response.status(403).json({error: 'only the creator can update this blog'})
   }
 
   const newBlogInfo = {
@@ -84,7 +80,11 @@ blogsRouter.put('/:id', async (request, response, next) => {
       likes: blog.likes
   }
 
+  console.log('estoy aca')
+
   try{
+    console.log('entre al try')
+    console.log(id)
     const result = await Blog.findByIdAndUpdate(id, newBlogInfo, { new: true })
     response.status(200).json(result)
   }catch(error){

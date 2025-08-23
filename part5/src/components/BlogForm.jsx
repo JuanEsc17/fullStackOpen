@@ -1,9 +1,13 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
+import Togglable from './Togglable'
+import PropTypes from 'prop-types'
 
 const BlogForm = ({ addBlog }) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
+
+    const togglableRef = useRef()
 
     const handleCreate = (event) => {
       event.preventDefault()
@@ -17,10 +21,12 @@ const BlogForm = ({ addBlog }) => {
       setAuthor('')
       setUrl('')
       addBlog(blogObject)
+      togglableRef.current.toggleVisibility()
     }
 
     return (
       <div>
+        <Togglable ref={togglableRef} buttonLabelShow='create new blog' buttonLabelHide='cancel'>
         <h2>create new blog</h2>
         <form onSubmit={handleCreate}>
           <div>
@@ -54,8 +60,13 @@ const BlogForm = ({ addBlog }) => {
             create
           </button>
         </form>
+        </Togglable>
       </div>
     )
   }
+
+BlogForm.propTypes = {
+  addBlog: PropTypes.func.isRequired
+}
 
   export default BlogForm

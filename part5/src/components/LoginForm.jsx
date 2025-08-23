@@ -1,5 +1,7 @@
 import { useState } from "react"
 import loginService from '../services/login'
+import Togglable from "./Togglable"
+import PropTypes from 'prop-types'
 
 const LoginForm  = ({ logIn }) => {
     const [username, setUsername] = useState('')
@@ -19,7 +21,7 @@ const LoginForm  = ({ logIn }) => {
 
     return(
     <div>
-        <div>
+        <Togglable buttonLabelShow="login" buttonLabelHide='cancel'>
             <form onSubmit={handleLogin}>
                 <div>
                 <input 
@@ -45,9 +47,13 @@ const LoginForm  = ({ logIn }) => {
                 </button>
                 </div>
             </form>
-        </div>
+        </Togglable>
     </div>
     )
   }
+
+LoginForm.propTypes = {
+    logIn: PropTypes.func.isRequired
+}
 
 export default LoginForm

@@ -1,26 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import loginService from './services/login'
 import LoginForm from './components/LoginForm'
-import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import Message from './components/Message'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [message, setMessage] = useState(null)
   const [user, setUser] = useState(null)
-  
-  const [messageStyle, setMessageStyle] = useState(null)
+
+  const messageRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
     )  
   }, [])
-
-  console.log(blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -28,6 +23,7 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
+      console.log(user)
     }
   }, [])
 
@@ -44,17 +40,29 @@ const App = () => {
         .then(returnedBlog => {
           setBlogs(blogs.concat(returnedBlog))
         })
-        setMessageStyle('message')
-        setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+        messageRef.current.showMessage('message',
+           `a new blog ${blogObject.title} by ${blogObject.author} added`)
       }catch(e){
         console.log(e)
-        setMessageStyle('error')
-        setMessage('unexpected error')
+        messageRef.current.showMessage('error',
+          'unexpected error')
       }
-    setTimeout(() => {
-        setMessageStyle(null)
-        setMessage(null)
-      }, 5000)
+  }
+
+  const deleteBlog = (blogToDelete, username) => {
+    if (username === user.username){
+      if(window.confirm(`remove blog ${blogToDelete.title} by ${blogToDelete.author}`)){
+        try{
+          blogService
+          .deleteBlog(blogToDelete.id)
+          .then(deletedBlog => setBlogs(blogs.filter(blog => blog.id === deletedBlog.id)))
+        }catch(e){
+          console.log(e)
+          messageRef.current.showMessage('error', e)
+        }
+      }
+      
+    }
   }
 
   const logIn = (user) =>{
@@ -66,20 +74,21 @@ const App = () => {
       setUser(user)
     }catch(e){
       console.log(e)
-      setMessageStyle('error')
-      setMessage('wrong username or password')
-      setTimeout(() => {
-        setMessage(null)
-        setMessageStyle(null)
-    }, 5000)}
+      messageRef.current.showMessage('error',
+           `wrong username or password`)
+      }
   }
 
-  const updateBlog = (updatedBlog) => {
-    blogService
-      .update(updatedBlog.id, updatedBlog)
-      .then(returnedBlogs => {
-          setBlogs(returnedBlogs)
-        })
+  const updateBlog = async (blogToUpdate) => {
+    try {
+      const updatedBlog = await blogService.update(blogToUpdate.id, blogToUpdate)
+      setBlogs(blogs.map(blog => 
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      ))
+    } catch (error) {
+      console.error('Error updating blog:', error)
+      messageRef.current.showMessage('Error updating blog', 'error')
+    }
   }
 
   return (
@@ -87,25 +96,22 @@ const App = () => {
       <h2>blogs</h2>
       {
         !user
-        ? <Togglable buttonLabelShow='show login' buttonLabelHide='cancel'>
-            <LoginForm 
-              logIn={logIn}
-            />
-          </Togglable>
+        ? 
+          <LoginForm 
+            logIn={logIn}
+          />
         :<div>
           <p>
             {user.username} logged in 
             <button onClick={handleLogOut}>logout</button>
           </p>
-          <Togglable buttonLabelShow="new blog" buttonLabelHide='cancel'>
-            <BlogForm addBlog={addBlog}/>
-          </Togglable>
+          <BlogForm addBlog={addBlog}/>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} user={user}/>
           )}
         </div>
       }
-      <Message message={message} messageStyle={messageStyle}/>
+      <Message ref={messageRef}/>
     </div>
   )
 }
