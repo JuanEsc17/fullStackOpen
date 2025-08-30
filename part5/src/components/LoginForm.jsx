@@ -1,22 +1,20 @@
 import { useState } from "react"
-import loginService from '../services/login'
-import Togglable from "./Togglable"
 import PropTypes from 'prop-types'
+import Togglable from "./Togglable"
 
-const LoginForm  = ({ logIn }) => {
+const LoginForm = ({ logIn }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
     const handleLogin = async (event) => {
         event.preventDefault()
-        const user = await loginService.login({
-            username,
-            password
-        })
-
-        setUsername('')
-        setPassword('')
-        logIn(user)
+        try {
+            await logIn({ username, password })
+            setUsername('')
+            setPassword('')
+        } catch (error) {
+            console.error('Error en login:', error)
+        }
     }
 
     return(
@@ -50,7 +48,7 @@ const LoginForm  = ({ logIn }) => {
         </Togglable>
     </div>
     )
-  }
+}
 
 LoginForm.propTypes = {
     logIn: PropTypes.func.isRequired

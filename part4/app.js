@@ -6,6 +6,7 @@ const middleware = require('./utils/middlewares')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const testingRouter = require('./controllers/testing')
 require('dotenv').config()
 
 const { MONGO_DB_URI, MONGO_DB_URI_TEST, NODE_ENV }= process.env
@@ -32,6 +33,11 @@ app.use(middleware.userExtractor)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+console.log(NODE_ENV, '--------------------------------------------------------------------------------------------------')
+if(NODE_ENV === 'test'){
+  console.log('modo test activo')
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(middleware.notFound)
 app.use(middleware.handleErrors)

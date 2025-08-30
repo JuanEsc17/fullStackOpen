@@ -4,6 +4,7 @@ import blogService from './services/blogs'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Message from './components/Message'
+import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -65,18 +66,21 @@ const App = () => {
     }
   }
 
-  const logIn = (user) =>{
-    try{
+  const logIn = async (credentials) => {
+    try {
+      const user = await loginService.login(credentials)
       window.localStorage.setItem(
-            'loggedBlogAppUser', JSON.stringify(user)
-        )
+        'loggedBlogAppUser', JSON.stringify(user)
+      )
       blogService.setToken(user.token)
       setUser(user)
-    }catch(e){
-      console.log(e)
-      messageRef.current.showMessage('error',
-           `wrong username or password`)
-      }
+    } catch (error) {
+      console.error('Error en login:', error)
+      messageRef.current.showMessage(
+        'error',
+        'wrong username or password'
+      )
+    }
   }
 
   const updateBlog = async (blogToUpdate) => {
