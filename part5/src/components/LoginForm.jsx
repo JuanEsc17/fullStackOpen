@@ -21,7 +21,7 @@ const LoginForm  = ({ logIn }) => {
 
     return(
     <div>
-        <Togglable buttonLabelShow="login" buttonLabelHide='cancel'>
+        <Togglable buttonLabelShow="show login" buttonLabelHide='cancel'>
             <form onSubmit={handleLogin}>
                 <div>
                 <input 
@@ -42,7 +42,7 @@ const LoginForm  = ({ logIn }) => {
                 />
                 </div>
                 <div>
-                <button>
+                <button id='form-login-button'>
                     Login
                 </button>
                 </div>

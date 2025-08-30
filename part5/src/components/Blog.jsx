@@ -1,7 +1,7 @@
 import Togglable from "./Togglable"
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, user}) => {
    const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -9,6 +9,8 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
     borderWidth: 1,
     marginBottom: 5
   }
+
+  console.log(blog.user)
 
   const handleLike = async () => {
     const updatedBlog = {
@@ -31,24 +33,28 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   }
 
   return (
-  <div style={blogStyle}>
-    {blog.title}
-    <Togglable buttonLabelShow='view' buttonLabelHide='hide'> 
-      <p>
-        {blog.url}
-      </p>
-      <p>
-        likes {blog.likes}
-        <button onClick={handleLike}>like</button>
-      </p>
-      <p>
+  <div style={blogStyle} className='blog'>
+    <div className='blog-title'>
+      {blog.title}  
+    </div>
+    <p className="blog-author">
         {blog.author}
-      </p>
-      {
-        user.username === blog.user.username
-        ? <button onClick={handleDelete}>remove</button>
-        : <></>
-      }
+    </p>
+    <Togglable buttonLabelShow='view' buttonLabelHide='hide'>
+      <div className="blog-details">
+        <p className="blog-url">
+          {blog.url}
+        </p>
+        <p className="blog-likes">
+          likes {blog.likes}
+          <button onClick={handleLike}>like</button>
+        </p>
+        {
+          user.username === blog.author
+          ? <button onClick={handleDelete}>remove</button>
+          : <></>
+        }
+      </div>
     </Togglable>
   </div>  
   )
@@ -56,9 +62,9 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
+  updateBlog: PropTypes.func,
+  deleteBlog: PropTypes.func,
+  user: PropTypes.object
 }
 
 export default Blog

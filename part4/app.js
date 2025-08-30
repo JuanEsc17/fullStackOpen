@@ -16,7 +16,7 @@ const connectionString = NODE_ENV === 'test'
 
 mongoose.connect(connectionString)
   .then(() => {
-    console.log(`connected to MongoDB ${NODE_ENV === 'test' ? test : "normal"}`)
+    console.log(`connected to MongoDB ${NODE_ENV === 'test' ? "test" : "normal"}`)
     console.log()
   })
   .catch((error) => {
